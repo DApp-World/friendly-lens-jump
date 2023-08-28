@@ -9,9 +9,24 @@ declare global {
 import { useEffect, useState } from "react";
 
 import { Game } from "./main";
+import Followers from "./followers";
+
+import { useActiveProfile } from "@lens-protocol/react-web";
 
 export default () => {
   const [gameover, setGameover] = useState<boolean>(false);
+  const [shouldLoadFriends, setShouldLoadFriends] = useState<boolean>(false);
+  const {
+    data: activeProfile,
+    error: profileError,
+    loading: isActiveProfileLoading,
+  } = useActiveProfile();
+
+  useEffect(() => {
+    if (!isActiveProfileLoading && !activeProfile) {
+      alert("Please login to play..");
+    }
+  }, [isActiveProfileLoading]);
 
   useEffect(() => {
     const canvas: HTMLCanvasElement | null = document.getElementById(
@@ -40,10 +55,24 @@ export default () => {
       <div style={{ marginTop: "30px" }}>
         {gameover ? (
           <>
+            <button
+              className="button"
+              onClick={() => {
+                setShouldLoadFriends(true);
+              }}
+            >
+              Challenge Friends ?
+            </button>
             <a href="/game" className="button">
               Try again
             </a>
           </>
+        ) : (
+          ""
+        )}
+
+        {shouldLoadFriends && !isActiveProfileLoading ? (
+          <Followers profileId={activeProfile?.id}></Followers>
         ) : (
           ""
         )}
