@@ -9,12 +9,16 @@ declare global {
 import React, { useEffect, useState } from "react";
 import { Game } from "../../main";
 import { useActiveProfile } from "@lens-protocol/react-web";
+import Post from "./post";
 
 // http://localhost:3000/game/fearless99/400
 
 export default function page({ params }: { params: any }) {
   const [gameover, setGameover] = useState<boolean>(false);
   const [gameWon, setGameWon] = useState<boolean>(false);
+  const [postStatus, setPostStatus] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>();
+
   const {
     data: userProfile,
     error: userProfileError,
@@ -44,6 +48,19 @@ export default function page({ params }: { params: any }) {
     game.start();
   }, []);
 
+  const postToFeed = async () => {
+    let messageText = ``;
+    if (gameWon) {
+      messageText = `I just beat ${params.lenshandle} at LensJump!!!!`;
+    } else {
+      messageText = `I lost to ${params.lenshandle} at LensJump :( I'll get you next time 😈`;
+    }
+    setMessage(messageText);
+    if (confirm("Post to feed: " + messageText)) {
+      setPostStatus(true);
+    }
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       <div style={{ maxWidth: "1000px" }}>
@@ -58,6 +75,15 @@ export default function page({ params }: { params: any }) {
               <h1>Congrats! {userProfile?.handle}! You won</h1>
             ) : (
               <h1>Sorry, {userProfile?.handle}! you lost</h1>
+            )}
+
+            <button onClick={postToFeed} className="button">
+              Post to your feed!
+            </button>
+            {postStatus && userProfile ? (
+              <Post message={message || ""} profile={userProfile} />
+            ) : (
+              ""
             )}
           </div>
         ) : (
