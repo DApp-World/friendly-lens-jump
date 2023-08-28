@@ -15,6 +15,7 @@ import { useActiveProfile } from "@lens-protocol/react-web";
 
 export default () => {
   const [gameover, setGameover] = useState<boolean>(false);
+  const [scoreObj, setScore] = useState<any>();
   const [shouldLoadFriends, setShouldLoadFriends] = useState<boolean>(false);
   const {
     data: activeProfile,
@@ -40,6 +41,7 @@ export default () => {
       setGameover(true);
     });
     game.setScoreCallback((score) => {
+      setScore(score);
       window.score = score;
     });
     game.start();
@@ -72,7 +74,11 @@ export default () => {
         )}
 
         {shouldLoadFriends && !isActiveProfileLoading ? (
-          <Followers profileId={activeProfile?.id}></Followers>
+          <Followers
+            profileId={activeProfile?.id}
+            lensHandle={activeProfile?.handle}
+            score={scoreObj}
+          ></Followers>
         ) : (
           ""
         )}
